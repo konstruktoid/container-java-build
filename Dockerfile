@@ -1,16 +1,15 @@
-FROM konstruktoid/debian:wheezy
-
-ENV DEB 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main'
+FROM konstruktoid/ubuntu:bionic
 
 RUN \
-    echo $DEB > /etc/apt/sources.list.d/webupd8team-java.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \
+    apt-get -y update && \
+    apt-get -y install gnupg --no-install-recommends && \
+    echo 'deb http://ppa.launchpad.net/openjdk-r/ppa/ubuntu bionic main' | tee /etc/apt/sources.list.d/openjdk.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DA1A4A13543B466853BAF164EB9B1D8886F44E2A && \
     apt-get update && \
-    apt-get -y upgrade && \
-    apt-get -y install oracle-java8-installer --no-install-recommends && \
-    apt-get -y clean
+    apt-get -y install openjdk-11-jdk-headless --no-install-recommends && \
+    apt-get -y purge gnupg && \
+    apt-get -y clean && \
+    apt-get -y autoremove
 
 RUN \
     rm -rf /var/lib/apt/lists/* \

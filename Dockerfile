@@ -1,4 +1,4 @@
-FROM konstruktoid/ubuntu:bionic
+FROM konstruktoid/ubuntu:focal
 
 RUN \
     apt-get -y update && \

@@ -13,6 +13,9 @@ ENV LANG=C.UTF-8
 
 # openjdk-21 is the current LTS in the noble archive, so no third-party
 # repository or key handling is needed.
+# The JDK is deliberately unpinned: the image exists to carry the newest
+# patched OpenJDK build. See "Reproducibility" in README.md.
+# hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get -y install --no-install-recommends \
@@ -23,5 +26,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
       /usr/share/doc /usr/share/doc-base \
       /usr/share/man /usr/share/locale /usr/share/zoneinfo
+
+# Nothing here needs root, so the image ships a dedicated account rather than
+# leaving it to whoever runs it. The uid and gid are fixed so a mounted volume
+# can be chowned to them on the host.
+RUN groupadd --system --gid 10001 java && \
+    useradd --system --uid 10001 --gid 10001 \
+      --home-dir /home/java --create-home --shell /usr/sbin/nologin java
+
+WORKDIR /home/java
+
+USER 10001:10001
 
 CMD ["java", "-version"]
